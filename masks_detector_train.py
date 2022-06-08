@@ -5,7 +5,7 @@ from torchvision import transforms, datasets
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import plot_confusion_matrix
 from skorch import NeuralNetClassifier
 from torch.utils.data import random_split
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     train_data, val_data = random_split(trainset, [int(m - int(m * 0.2)), int(m * 0.2)])
     DEVICE = torch.device("cpu")
     y_train = np.array([y for x, y in iter(train_data)])
-    classes = ('cloth', 'n95', 'nomask', 'surgical')
+
 
     # CNN architecture for training process
     class CNN(nn.Module):
@@ -78,6 +78,7 @@ if __name__ == '__main__':
 
             return x
 
+
     torch.manual_seed(0)
     net = NeuralNetClassifier(
         CNN,
@@ -88,7 +89,8 @@ if __name__ == '__main__':
         batch_size=64,
         optimizer=optim.Adam,
         criterion=nn.CrossEntropyLoss,
-        device=DEVICE
+        device=DEVICE,
+
     )
     net.fit(train_data, y=y_train)
     net.save_params(f_params='model.pkl')
@@ -96,7 +98,10 @@ if __name__ == '__main__':
     y_test = np.array([y for x, y in iter(testset)])
     # print(accuracy_score(y_test, y_pred))
     print(classification_report(y_test, y_pred))
-    print(confusion_matrix(y_test, y_pred))
-    plot_confusion_matrix(net, testset, y_test.reshape(-1, 1))
+    labels = ['cloth', 'n95', 'nomask', 'surgical']
+    cm = confusion_matrix(y_test, y_pred)
+    print(cm)
+    ConfusionMatrixDisplay(cm, display_labels=labels).plot()
     plt.show()
+
 
