@@ -1,11 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from sklearn import model_selection
+from skorch.helper import SliceDataset
 from torchvision import transforms, datasets
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay, \
+    make_scorer, precision_score, recall_score, f1_score
 from sklearn.metrics import plot_confusion_matrix
 from skorch import NeuralNetClassifier
 from torch.utils.data import random_split
@@ -29,8 +32,7 @@ if __name__ == '__main__':
     m = len(trainset)
     train_data, val_data = random_split(trainset, [int(m - int(m * 0.2)), int(m * 0.2)])
     DEVICE = torch.device("cpu")
-    y_train = np.array([y for x, y in iter(train_data)])
-
+    y_train = np.array([y for x, y in iter(train_data)]).astype(np.int64)
 
     # CNN architecture for training process
     class CNN(nn.Module):
@@ -94,6 +96,8 @@ if __name__ == '__main__':
     )
     net.fit(train_data, y=y_train)
     net.save_params(f_params='model.pkl')
+
+# Train/test split evaluation
     y_pred = net.predict(testset)
     y_test = np.array([y for x, y in iter(testset)])
     # print(accuracy_score(y_test, y_pred))
@@ -103,5 +107,24 @@ if __name__ == '__main__':
     print(cm)
     ConfusionMatrixDisplay(cm, display_labels=labels).plot()
     plt.show()
+
+# K_fold cross-validation
+#     train_sliceable = SliceDataset(train_data)
+#     scoring = {'accuracy': make_scorer(accuracy_score),
+#                'precision': make_scorer(precision_score, average='macro'),
+#                'recall': make_scorer(recall_score, average='macro'),
+#                'f1_score': make_scorer(f1_score, average='macro')}
+#
+#     results = model_selection.cross_validate(net, train_sliceable, y_train, cv=10,
+#                                              scoring=scoring)
+#     print('Precision', results['test_precision'])
+#     print('Recall', results['test_recall'])
+#     print('F1-score', results['test_f1_score'])
+#     print('Accuracy', results['test_accuracy'])
+#     print('Aggregate Precision', results['test_precision'].mean())
+#     print('Aggregate Recall', results['test_recall'].mean())
+#     print('Aggregate F1-score', results['test_f1_score'].mean())
+#     print('Aggregate Accuracy', results['test_accuracy'].mean())
+
 
 
