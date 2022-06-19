@@ -62,7 +62,7 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225])
     ])
-    sample_dataset = datasets.ImageFolder(root='./img/sample',
+    sample_dataset = datasets.ImageFolder(root='./img/gender/male',
                                           transform=data_transform)
 
     # download saved trained model for sample dataset evaluation
