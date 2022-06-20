@@ -84,8 +84,8 @@ if __name__ == '__main__':
     y_pred = new_net.predict(sample_dataset)
     y_test = np.array([y for x, y in iter(sample_dataset)])
     # print(accuracy_score(y_test, y_pred))
-    print(y_test)
-    print(y_pred)
+    # print(y_test)
+    # print(y_pred)
     print(classification_report(y_test, y_pred))
     labels = ['cloth', 'n95', 'nomask', 'surgical']
     cm = confusion_matrix(y_test, y_pred)

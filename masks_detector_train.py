@@ -31,8 +31,9 @@ if __name__ == '__main__':
     trainset, testset = torch.utils.data.random_split(masks_dataset, [int(n - int(n * 0.25)), int(n * 0.25)])
     m = len(trainset)
     train_data, val_data = random_split(trainset, [int(m - int(m * 0.2)), int(m * 0.2)])
-    DEVICE = torch.device("cpu")
+    DEVICE = torch.device("cuda")
     y_train = np.array([y for x, y in iter(train_data)]).astype(np.int64)
+    y_train_k = np.array([y for x, y in iter(trainset)]).astype(np.int64)
 
     # CNN architecture for training process
     class CNN(nn.Module):
@@ -94,21 +95,23 @@ if __name__ == '__main__':
         device=DEVICE,
 
     )
-    net.fit(train_data, y=y_train)
-    net.save_params(f_params='model.pkl')
+    # net.fit(train_data, y=y_train)
+    # net.save_params(f_params='model.pkl')
 
-# Train/test split evaluation
-    y_pred = net.predict(testset)
-    y_test = np.array([y for x, y in iter(testset)])
-    # print(accuracy_score(y_test, y_pred))
-    print(classification_report(y_test, y_pred))
-    labels = ['cloth', 'n95', 'nomask', 'surgical']
-    cm = confusion_matrix(y_test, y_pred)
-    print(cm)
-    ConfusionMatrixDisplay(cm, display_labels=labels).plot()
-    plt.show()
+    net.initialize()
+    net.load_params(f_params='model.pkl')
+# 1. Train/test split evaluation
+#     y_pred = net.predict(testset)
+#     y_test = np.array([y for x, y in iter(testset)])
+#     # print(accuracy_score(y_test, y_pred))
+#     print(classification_report(y_test, y_pred))
+#     labels = ['cloth', 'n95', 'nomask', 'surgical']
+#     cm = confusion_matrix(y_test, y_pred)
+#     print(cm)
+#     ConfusionMatrixDisplay(cm, display_labels=labels).plot()
+#     plt.show()
 
-# K_fold cross-validation
+# # 2. K_fold cross-validation
 #     train_sliceable = SliceDataset(train_data)
 #     scoring = {'accuracy': make_scorer(accuracy_score),
 #                'precision': make_scorer(precision_score, average='macro'),
