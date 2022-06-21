@@ -121,10 +121,10 @@ if __name__ == '__main__':
 
     )
     # net.fit(train_data, y=y_train)
-    # net.save_params(f_params='model2.pkl')
+    # net.save_params(f_params='model2+.pkl')
 # Load the training model for train/test split evaluation
     net.initialize()
-    net.load_params(f_params='model2.pkl')
+    net.load_params(f_params='model2+.pkl')
 #     y_pred = net.predict(testset)
 #     y_test = np.array([y for x, y in iter(testset)])
 #     # print(accuracy_score(y_test, y_pred))
